@@ -6,7 +6,10 @@ using UnityEngine;
 public enum ItemType
 {
     Equipment,
-    Consumables
+    Consumables,
+    Gold,
+    Water,
+    Torch
 }
 
 //[RequireComponent(typeof(ItemPickup))]
@@ -18,21 +21,21 @@ public abstract partial class Item : ScriptableObject
     public string itemName;
     [System.NonSerialized]
     public ItemType itemType;
+    [System.NonSerialized]
+    public GameObject itemPrefab;
+    [System.NonSerialized]//This is set in item pickup on start
     public Sprite sprite;
     public bool defaultItem;
     public int cost;
     public bool stackable;
     public int count;
+    public string itemDescription;
 
     //Destroy Item in Inventory
-    public virtual void RemoveFromInventory(int removeCount)
-    {
-        //removes the item from inventory
-    }
 
     public virtual void Use()
     {
         //calls the use function from whatever inherits from this
-        RemoveFromInventory(1);
+        GameManager.instance.playerInventory.Remove(this, 1);//Destroy Item in Inventory
     }
 }

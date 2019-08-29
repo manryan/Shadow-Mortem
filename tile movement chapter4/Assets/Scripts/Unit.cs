@@ -38,9 +38,30 @@ public class Unit : Entity
 
     public Transform xpBar;
 
+    public void Save()
+    {
+        //string saveInventory = JsonUtility.ToJson(inventory);
+        //PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", saveInventory);
+        inventory.Save();
+    }
+
+    public void Load()
+    {
+        //string loadInventory = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
+        //inventory = JsonUtility.FromJson<InventorySystem>(loadInventory);
+        inventory.Load();
+    }
+
     //Inventory System
-    [System.NonSerialized]
+    //[System.NonSerialized]
     public InventorySystem inventory;
+    Item tempItem;//For picking up items
+    int tempItemCount;
+    GameObject tempItemGameobject;
+
+    //Equipment Manager
+    [System.NonSerialized]
+    public EquipmentManager equipmentSystem;
 
     //Reference to object pool
     [System.NonSerialized]
@@ -48,7 +69,7 @@ public class Unit : Entity
 
     //Test items
 
-    public Item[] testItems;
+    public GameObject[] testItems;
 
     struct Boundary
     {
@@ -63,12 +84,14 @@ public class Unit : Entity
     public void Start()
     {
         inventory = new InventorySystem();
+        equipmentSystem = new EquipmentManager();
+        equipmentSystem.Start();
         objPoolManager = GameManager.instance.objPoolManager;
 
         //Test Items
         for (int i = 0; i < testItems.Length; i++)
         {
-            inventory.Add(testItems[i],17);
+            inventory.Add(testItems[i].GetComponent<ItemPickup>().item,17);
         }
 
         inventory.TestInventory();
@@ -176,6 +199,27 @@ public class Unit : Entity
     // Update is called once per frame
     void Update()
     {
+
+        //Temporary to be deleted for testing purposes
+        if(Input.GetKeyDown(KeyCode.X))
+        {
+            inventory.TestInventory();
+        }
+
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            Debug.Log("Saving");
+            Save();
+        }
+
+        if(Input.GetKeyDown(KeyCode.V))
+        {
+            Debug.Log("Loading");
+            Load();
+        }
+
+        //Testing bs ends here
+
         if (Input.GetMouseButtonDown(0))
         {
             touchStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -391,7 +435,7 @@ public class Unit : Entity
             currentNode.grass.SetActive(false);
             currentNode.cutGrass.SetActive(true);
             currentNode.grass = null;
-            currentNode.dropItems();
+            currentNode.lootDropItems();
         }
     }
 
@@ -606,13 +650,25 @@ public class Unit : Entity
                         neighbour.burntGrass.SetActive(true);
                         neighbour.cutGrass = null;
                        }
-                      //get rid of every loot item sitting on the node
-
-                    while (neighbour.stack.Count > 0)
+                    //get rid of every loot item sitting on the node
+                    Stack<GameObject> nonBurnableStack = new Stack<GameObject>();
+                    for (int i = 0; i < neighbour.stack.Count; i+=0)
                     {
-                        neighbour.stack.Peek().gameObject.SetActive(false);
-                        neighbour.stack.Pop();
+                        if (neighbour.stack.ElementAt(i).gameObject.GetComponent<ItemPickup>().item.itemType == ItemType.Consumables || neighbour.stack.ElementAt(i).gameObject.GetComponent<ItemPickup>().item.itemType == ItemType.Water)
+                        {
+                            neighbour.stack.ElementAt(i).gameObject.SetActive(false);
+                            neighbour.stack.Pop();
+                        }
+                        else
+                        {
+                            nonBurnableStack.Push(neighbour.stack.ElementAt(i).gameObject);
+                            neighbour.stack.ElementAt(i).GetComponent<SpriteRenderer>().sortingOrder = nonBurnableStack.Count + 2;
+                            neighbour.stack.Pop();
+                        }
                     }
+                    //nonBurnableStack.Reverse();
+                    neighbour.stack = nonBurnableStack;
+
                 }
             }
         
@@ -671,25 +727,48 @@ public class Unit : Entity
     {
         if (currentNode.stack.Count > 0)
         {
-            //check if we have enough inventory space
+            tempItemGameobject = currentNode.stack.Peek().gameObject;
 
-            //disable obj if we do otherwise ignore it.
-            //currentNode.stack.Peek().gameObject.SetActive(false);
-            objPoolManager.ObjectPoolAddition(currentNode.stack.Peek().gameObject);
+            if(tempItemGameobject == null)
+            {
+                Debug.LogError("Player is picking up an empty gameobject somehow");
+            }
+
+            //check if we have enough inventory space
+            //if true do this
 
             //check to see if we either consume it(dew), or add it to vial in inventory if health full? or add to invo
 
             //remove it from stack
             currentNode.stack.Pop();
 
-            //decrement nodes index for sprite rendering order
-            currentNode.index--;
+            ////decrement nodes index for sprite rendering order
+            //currentNode.index--;
 
             //check if there are still any items left on my node
 
             displayPickUpButton();
 
             //Add to inventoy Here
+            objPoolManager.ObjectPoolAddition(tempItemGameobject);
+
+            if (tempItemGameobject.GetComponent<ItemPickup>() == null)
+            {
+                Debug.Log(tempItemGameobject.name + "Error, Item Pickup Is not implimented onto this object");
+            }
+            if (tempItemGameobject.GetComponent<ItemPickup>().item == null)
+            {
+                Debug.Log(tempItemGameobject.name + "Error, The Item in Item Pickup component is null on this prefab object");
+            }
+
+            tempItem = tempItemGameobject.GetComponent<ItemPickup>().item;
+            tempItemCount = tempItemGameobject.GetComponent<ItemPickup>().count;
+            if(tempItemCount <= 0)
+            {
+                Debug.LogError(tempItemGameobject.name + " item pickup count is 0 or less then");
+            }
+
+            inventory.Add(tempItem, tempItemCount);
 
             //pass control to other entities if we picked something up?
             Control();
@@ -804,13 +883,13 @@ public class Unit : Entity
             //last lvl xp needed is updated
             lastLvlXp = xpToNextLvl;
 
-            //increase xp to next lvl
+            //increase xp to next lvl 
             xpToNextLvl += (1.5f*xpToNextLvl);
 
 
 
              p = (currentXp - lastLvlXp) / (xpToNextLvl - lastLvlXp);
-          userHpBarLength = p;//P * (scale in x)
+            userHpBarLength = p;//P * (scale in x)
             localScale.x = userHpBarLength;
             xpBar.localScale = localScale;
         }

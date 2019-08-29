@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour {
     [System.NonSerialized]
     public InventorySystem playerInventory;
 
-    [System.NonSerialized]
+    //[System.NonSerialized]
     public ObjectPoolingManager objPoolManager;
 
     #endregion
@@ -36,8 +36,6 @@ public class GameManager : MonoBehaviour {
         }
 
         DontDestroyOnLoad(gameObject);
-
-        ResetScriptableObjectsCount();
     }
 
     public static GameManager instance
@@ -54,21 +52,21 @@ public class GameManager : MonoBehaviour {
         playerInventory = player.GetComponent<Unit>().inventory;
 	}
 
-    void ResetScriptableObjectsCount()
-    {
-        //Resets the count of scriptable objects (Items) due to the fact that they stay regardless if the game is stopped or not
-        Dictionary<string, Item> itemCache = new Dictionary<string, Item>();
+    //void ResetScriptableObjectsCount()  Moved to object pool manager
+    //{
+    //    //Resets the count of scriptable objects (Items) due to the fact that they stay regardless if the game is stopped or not
+    //    Dictionary<string, Item> itemCache = new Dictionary<string, Item>();
 
-        itemCache = Resources.LoadAll<Item>("Items").ToDictionary(item => item.name, item => item);
+    //    itemCache = Resources.LoadAll<Item>("Items").ToDictionary(item => item.name, item => item);
 
-        //Debug.Log(itemCache.Count);
+    //    //Debug.Log(itemCache.Count);
 
-        for (int i = 0; i < itemCache.Count; i++)
-        {
-            itemCache.ElementAt(i).Value.count = 0;
-        }
+    //    for (int i = 0; i < itemCache.Count; i++)
+    //    {
+    //        itemCache.ElementAt(i).Value.count = 0;
+    //    }
 
-        //Debug.Log("Item Total in Resources Folder " + itemCache.Count.ToString());
-    }
+    //    //Debug.Log("Item Total in Resources Folder " + itemCache.Count.ToString());
+    //}
 
 }

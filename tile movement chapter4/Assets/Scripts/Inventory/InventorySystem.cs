@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]//For Saving
 public class InventorySystem {
 
     public List<Item> inventory = new List<Item>();
 
-    const int MAX_INVENTORY_SIZE = 24;
+    const int MAX_INVENTORY_SIZE = 16;    
 
     #region AddMethod
 
@@ -56,19 +57,101 @@ public class InventorySystem {
         if(item.stackable == true)
         {
             Item temp = inventory.Find(x => x.itemName == item.itemName);//.count -= item.count;
-            temp.count -= item.count;
+            temp.count -= itemCount;
             if(temp.count <= 0 && temp.defaultItem ==false)//if item isnt always in the inventory then remove the item from inventory
             {
-                inventory.Remove(item);
-                //put object onto the floor with correct count
+                if(temp.itemType != ItemType.Gold || temp.itemType != ItemType.Water)
+                {
+                    inventory.Remove(item);
+                    //If player drops item this is done through the inventory UI since this removes the item even if used
+                }
             }
         }
         else
         {
             inventory.Remove(item);
-            //put object onto floor
+            //If player drops item this is done through the inventory UI since this removes the item even if used
         }
     }
+    #endregion
+
+    //make a bool to check to see if this item can be added to the inventory;
+
+    #region Saving/Loading
+    
+    struct ItemAndCount
+    {
+        public Item item;
+        public int count;
+    }
+
+    [System.Serializable]
+    class InventorySave
+    {
+        public List<ItemAndCount> saveList;
+    }
+
+    public void Save()
+    {
+        string inventorySave = "";
+
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            if (i != inventory.Count - 1)
+                inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType + "*";
+            else
+                inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType;
+        }
+
+        PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", inventorySave);
+
+
+
+
+        //InventorySave inventorySave = new InventorySave();
+        //inventorySave.saveList = new List<ItemAndCount>();
+
+        //for (int i = 0; i < inventory.Count; i++)
+        //{
+        //    ItemAndCount current = new ItemAndCount();
+        //    current.item = inventory[i];
+        //    current.count = inventory[i].count;
+        //    inventorySave.saveList.Add(current);
+        //}
+
+        //string saveInventory = JsonUtility.ToJson(inventorySave);
+        //PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", saveInventory);
+    }
+
+    public void Load()
+    {
+        string temp = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
+        string[] inventoryLoad = temp.Split("*".ToCharArray());
+        string[] tempItemAndCount;
+
+        inventory = new List<Item>();
+
+        for (int i = 0; i < inventoryLoad.Length; i++)
+        {
+            tempItemAndCount = inventoryLoad[i].Split("^".ToCharArray());
+            Item tempItem = Resources.Load<Item>("Items/ScriptableObjects/" + tempItemAndCount[2] + "/" + tempItemAndCount[0]);
+            tempItem.count = 0;
+            Add(tempItem, System.Int32.Parse(tempItemAndCount[1]));
+        }
+
+
+
+        //string loadInventory = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
+        //InventorySave inventoryLoad = JsonUtility.FromJson<InventorySave>(loadInventory);
+
+        //inventory = new List<Item>();
+
+        //for (int i = 0; i < inventoryLoad.saveList.Count; i++)
+        //{
+        //    Add(inventoryLoad.saveList[i].item, inventoryLoad.saveList[i].count);
+        //}
+    }
+
     #endregion
 
     #region Testing

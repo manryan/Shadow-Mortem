@@ -63,12 +63,12 @@ public class Node {
 			);
 	}
 	
-    public void addItems()
-    {
+    //public void PlayerDropItem()
+    //{
 
-    }
+    //}
 
-    public void dropItems()
+    public void lootDropItems()
     {
         //manage render cue as well via a stack. push onto the stack using loot manager in myTile?
         myTile.spawnGrassLoot();

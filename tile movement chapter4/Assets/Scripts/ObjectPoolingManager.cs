@@ -19,16 +19,16 @@ public class ObjectPoolingManager : MonoBehaviour {
     //Gold Pooling
     [Header("Gold")]
     public int goldPoolingAmount;
-    public GameObject goldPrefab;
 
     //Water Pooling
     [Header("Water")]
     public int waterPoolingAmount;
-    public GameObject waterPrefab;
 
     //Standard Pooling
     Dictionary<string, GameObject> itemCache = new Dictionary<string, GameObject>();
 
+    //Temp
+    Transform playerCurrentLocation;
 
     //Audio SFX
     [Header("Audio SFX")]
@@ -40,7 +40,7 @@ public class ObjectPoolingManager : MonoBehaviour {
     void Start()
     {
 
-        #region Gold Pooling Creation
+        #region Pooling Creation Amount Checker
 
         if (goldPoolingAmount <= 0)
         {
@@ -48,26 +48,10 @@ public class ObjectPoolingManager : MonoBehaviour {
             goldPoolingAmount = 3;
         }
 
-        for (int i = 0; i < goldPoolingAmount; i++)
-        {
-            temp = Instantiate(goldPrefab, this.transform);
-            temp.SetActive(false);
-        }
-
-        #endregion
-
-        #region Water Pooling Creation
-
         if (waterPoolingAmount <= 0)
         {
             Debug.LogWarning("waterPoolingAmount is not set, setting to 5");
             waterPoolingAmount = 5;
-        }
-
-        for (int i = 0; i < waterPoolingAmount; i++)
-        {
-            temp = Instantiate(waterPrefab, this.transform);
-            temp.SetActive(false);
         }
 
         #endregion
@@ -78,18 +62,45 @@ public class ObjectPoolingManager : MonoBehaviour {
 
         for (int i = 0; i < itemCache.Count; i++)
         {
-            if (itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemName == goldPrefab.name)// || itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemName != waterPrefab.name)
+
+            if (itemCache.ElementAt(i).Value.GetComponent<ItemPickup>() == null)
             {
-                //This is here because if put not equal to it would still run due to the face that gold is not equal to water and vice versa
-                //causing it to enter the loop even if its unwanted
+                Debug.LogWarning(itemCache.ElementAt(i).Value.name + "Error, Item Pickup Is not implimented onto this object");
             }
-            else if(itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemName == waterPrefab.name)
+            if (itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item == null)
             {
-                //same reasoning as before
+                Debug.LogWarning(itemCache.ElementAt(i).Value.name + "Error, The Item in Item Pickup component is null on this prefab object");
+            }
+            if (itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemName == "")
+            {
+                Debug.LogWarning(itemCache.ElementAt(i).Value.name + "Error, The Item in Item Pickup Scriptable Object name is null on this prefab object");
+            }
+            //if (transform.GetChild(i).GetComponent<ItemPickup>().item.itemGameObject == null)
+            //{
+            //    Debug.LogWarning(transform.GetChild(i).name + "Error, The Item Game Object in Item Pickup Scriptable Object name is null on this prefab object");
+            //}
+
+            //This resets all starting values to 0 just incase
+            itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.count = 0;
+
+            if (itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemType == ItemType.Gold)
+            {
+                for (int j = 0; j < goldPoolingAmount; j++)
+                {
+                    temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
+                    temp.SetActive(false);
+                }
+            }
+            else if(itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemType == ItemType.Water)
+            {
+                for (int j = 0; j < waterPoolingAmount; j++)
+                {
+                    temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
+                    temp.SetActive(false);
+                }
             }
             else
             { 
-                Debug.Log(itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemName + " " + goldPrefab.GetComponent<ItemPickup>().item.itemName + " " + waterPrefab.GetComponent<ItemPickup>().item.itemName);
                 temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
                 temp.SetActive(false);
             }
@@ -100,16 +111,20 @@ public class ObjectPoolingManager : MonoBehaviour {
 
         itemCache = new Dictionary<string, GameObject>();
 
+        int counterAidGold = 0;
+        int counterAidWater = 0;
+
         for (int i = 0; i < this.transform.childCount; i++)
         {
-            if(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName == goldPrefab.name) //|| this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName != waterPrefab.name)
+            if(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemType == ItemType.Gold) //|| this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName != waterPrefab.name)
             {
-                //This is here because if put not equal to it would still run due to the face that gold is not equal to water and vice versa
-                //causing it to enter the loop even if its unwanted
+                itemCache.Add(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + counterAidGold.ToString(), this.transform.GetChild(i).gameObject);
+                counterAidGold++;
             }
-            else if(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName == waterPrefab.name)
+            else if(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemType == ItemType.Water)
             {
-                //Same Reason as Before
+                itemCache.Add(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + counterAidWater.ToString(), this.transform.GetChild(i).gameObject);
+                counterAidWater++;
             }
             else
             {
@@ -118,23 +133,7 @@ public class ObjectPoolingManager : MonoBehaviour {
             }
         }
 
-        int counterAidGold = 0;
-        int counterAidWater = 0;
-        foreach (Transform goldNWater in this.transform)
-        {
-            if(goldNWater.GetComponent<ItemPickup>().item.itemName == goldPrefab.name)
-            {
-                itemCache.Add(goldNWater.GetComponent<ItemPickup>().item.itemName + counterAidGold.ToString(), goldNWater.gameObject);
-                counterAidGold++;
-            }
-            else if(goldNWater.GetComponent<ItemPickup>().item.itemName == waterPrefab.name)
-            {
-                itemCache.Add(goldNWater.GetComponent<ItemPickup>().item.itemName + counterAidWater.ToString(), goldNWater.gameObject);
-                counterAidWater++;
-            }
-        }
-
-        Debug.Log(itemCache.Count);
+        Debug.Log(itemCache.Count + "How many items in the Object Pool");
 
         #endregion
 
@@ -300,6 +299,65 @@ public class ObjectPoolingManager : MonoBehaviour {
 
     #region Removing Object From Object Pool
 
+    public void ObjectPoolPlayerDrop(GameObject droppingItem, int droppingHowMany)
+    {
+
+        for (int i = 0; i < 99; i++)
+        {
+            if (itemCache.ContainsKey(droppingItem.GetComponent<ItemPickup>().item.itemName + i))
+            {
+                temp = itemCache[droppingItem.GetComponent<ItemPickup>().item.itemName + i];
+                if (!temp.activeInHierarchy)
+                {
+                    temp.transform.parent = GM.player.GetComponent<Unit>().currentNode.myTile.transform.Find("loot");
+                    temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
+                    temp.GetComponent<ItemPickup>().count = droppingHowMany;
+                    temp.SetActive(true);
+                    GM.player.GetComponent<Unit>().currentNode.stack.Push(temp);
+                    GM.player.GetComponent<Unit>().displayPickUpButton();
+                    Debug.Log("Found inactive object ", temp);
+                    break;
+                }
+                else
+                {
+                    Debug.Log("This item is active" + droppingItem.GetComponent<ItemPickup>().item.itemName + i);
+                }
+
+            }
+            else
+            {
+                temp = Instantiate(droppingItem.GetComponent<ItemPickup>().item.itemPrefab, Vector3.zero, Quaternion.identity);
+                temp.transform.parent = GM.player.GetComponent<Unit>().currentNode.myTile.transform.Find("loot");
+                temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
+                temp.GetComponent<ItemPickup>().count += droppingHowMany;
+                GM.player.GetComponent<Unit>().currentNode.stack.Push(temp);
+                GM.player.GetComponent<Unit>().displayPickUpButton();
+                break;
+            }
+        }
+
+    }
+
+    //Transform FindTilePlayerIsOn()
+    //{
+    //    playerCurrentLocation = GameManager.instance.player.transform;
+    //    Collider[] hit = Physics.OverlapSphere(playerCurrentLocation.transform.position, 1);
+    //    for (int i = 0; i < hit.Length; i++)
+    //    {
+    //        if(hit[i].GetComponent<ClickableTile>())
+    //        {
+    //            if(hit[i].GetComponent<ClickableTile>().tileX == playerCurrentLocation.transform.position.x && hit[i].GetComponent<ClickableTile>().tileY == playerCurrentLocation.transform.position.y)
+    //            {
+    //                playerCurrentLocation = hit[i].transform.Find("loot");
+    //                return playerCurrentLocation;
+    //            }
+
+    //        }
+    //    }
+    //    Debug.Log("This loop fucked up somehow");
+    //    return null;
+    //}
+
     public GameObject ObjectPoolFindNReturn(GameObject droppingItem, int droppingHowMany, Vector3 location)
     {
 
@@ -316,7 +374,6 @@ public class ObjectPoolingManager : MonoBehaviour {
                     temp.SetActive(true);
                     Debug.Log("Found inactive object ", temp);
                     return temp;
-                    //break;
                 }
             }
             else
@@ -326,7 +383,6 @@ public class ObjectPoolingManager : MonoBehaviour {
                 temp.transform.parent = null;
                 Debug.Log("Inactive object not Found, Creating New Object", temp);
                 return temp;
-                //break;
             }
         }
         Debug.Log("Unreachable Code Detected, fucked up somewhere in object pooling");

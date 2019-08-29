@@ -7,16 +7,12 @@ using UnityEngine;
 public class Consumables : Item {
 
     //public bool stackable;
+    [Header("Consumable Info")]
     public int hPHealed;
 
     public Consumables()
     {
-        itemType = ItemType.Consumables;//ties the item type to be correct
-        //GameObject temp = Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
-        //temp.name = "New Consumable";
-        //temp.transform.position = Vector3.zero;
-        //temp.AddComponent<ItemPickup>();
-        
+        itemType = ItemType.Consumables;//ties the item type to be correct        
     }
 
     public override void Use()
@@ -24,7 +20,8 @@ public class Consumables : Item {
         if(itemName != "Gold")
         {
             base.Use();
-            //gets the player and heals him
+            GameManager.instance.player.GetComponent<Unit>().health += hPHealed;
+            Debug.Log("Consumable used");
         }
     }
 }
