@@ -80,19 +80,17 @@ public class EquipmentManager
         if (oldItem != null)
         {
             //Takes away bonuses from the old item being taken off
-            //player.attack -= (int)oldItem.attackDamageBonus;
-            //player.defense -= (int)oldItem.attackAccuracyBonus;
-            //player.specialAttack -= (int)oldItem.defenseBonus;
-            //player.specialDefense -= (int)oldItem.agilityBonus;
-
-            player.inventory.Add(oldItem,singleObjectCount);
+            player.attackDamageBonus -= oldItem.attackDamageBonus;
+            player.attackAccuracyBonus -= oldItem.attackAccuracyBonus;
+            player.defenseBonus -= oldItem.defenseBonus;
+            player.agilityBonus -= oldItem.agilityBonus;
         }
 
         //Adds the bonuses of new item being equiped
-        //player.attack += (int)newItem.attackDamageBonus;
-        //player.defense += (int)newItem.attackAccuracyBonus;
-        //player.specialAttack += (int)newItem.defenseBonus;
-        //player.specialDefense += (int)newItem.agilityBonus;
+        player.attackDamageBonus += newItem.attackDamageBonus;
+        player.attackAccuracyBonus += newItem.attackAccuracyBonus;
+        player.defenseBonus += newItem.defenseBonus;
+        player.agilityBonus += newItem.agilityBonus;
 
         currentEquipment[slotIndex] = newItem;//adds the equipment to the array
     }
@@ -110,10 +108,10 @@ public class EquipmentManager
         if (oldItem != null)
         {
             //Takes away bonuses from the old item being taken off
-            //player.attack -= (int)oldItem.attackDamageBonus;
-            //player.defense -= (int)oldItem.attackAccuracyBonus;
-            //player.specialAttack -= (int)oldItem.defenseBonus;
-            //player.specialDefense -= (int)oldItem.agilityBonus;
+            player.attackDamageBonus -= oldItem.attackDamageBonus;
+            player.attackAccuracyBonus -= oldItem.attackAccuracyBonus;
+            player.defenseBonus -= oldItem.defenseBonus;
+            player.agilityBonus -= oldItem.agilityBonus;
         }
 
         //makes sure the old item is now null

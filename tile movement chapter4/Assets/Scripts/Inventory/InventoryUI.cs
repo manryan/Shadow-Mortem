@@ -69,7 +69,8 @@ public class InventoryUI : MonoBehaviour {
 
         #region Variable Setters
 
-        _inventoryUI = GameObject.Find("Canvas/InventoryUI");
+        _inventoryUI = transform.Find("InventoryUI").gameObject;
+        _inventoryUI.SetActive(true);//This must be set active due to the fact that gameobject.find cannot find inactive objects
 
         player = GameObject.FindGameObjectWithTag("Player");
 

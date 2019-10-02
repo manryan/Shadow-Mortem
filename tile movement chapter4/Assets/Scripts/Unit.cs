@@ -6,17 +6,30 @@ using UnityEngine.UI;
 
 public class Unit : Entity
 {
+
+    #region Variables
+
     public List<GameObject> enemiesInRange = new List<GameObject>();
 
     Vector3 touchStart;
 
+    //Leveling
     public int level = 1;
-
     public float currentXp;
-
     public float lastLvlXp;
-
     public float xpToNextLvl;
+
+    //Stats
+    int _attack;
+    int _accuracy;
+    int _defense;
+    int _agility;
+
+    //EquipmentBonus
+    float _attackAccuracyBonus;
+    float _attackDamageBonus;
+    float _agilityBonus;
+    float _defenseBonus;
 
     public SearchPool sPool;
 
@@ -38,22 +51,8 @@ public class Unit : Entity
 
     public Transform xpBar;
 
-    public void Save()
-    {
-        //string saveInventory = JsonUtility.ToJson(inventory);
-        //PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", saveInventory);
-        inventory.Save();
-    }
-
-    public void Load()
-    {
-        //string loadInventory = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
-        //inventory = JsonUtility.FromJson<InventorySystem>(loadInventory);
-        inventory.Load();
-    }
-
     //Inventory System
-    //[System.NonSerialized]
+    [System.NonSerialized]
     public InventorySystem inventory;
     Item tempItem;//For picking up items
     int tempItemCount;
@@ -70,6 +69,8 @@ public class Unit : Entity
     //Test items
 
     public GameObject[] testItems;
+
+    #endregion
 
     struct Boundary
     {
@@ -422,8 +423,6 @@ public class Unit : Entity
     public override void MoveNextTile()
     {
         StartCoroutine(move());
-
-       
     }
 
     //check to see if we can cut grass, and make current node drop items from tiles loot table
@@ -500,8 +499,6 @@ public class Unit : Entity
         //show pickup button if there is anything to pick up in my current node
 
         displayPickUpButton();
-
-
     }
 
 
@@ -546,7 +543,7 @@ public class Unit : Entity
 
             //move enemies in range
 
-            foreach (GameObject enemy in enemiesInRange)
+        foreach (GameObject enemy in enemiesInRange)
         {
 
             EnemyEntity entity = enemy.GetComponent<EnemyEntity>();
@@ -823,17 +820,16 @@ public class Unit : Entity
     {
         if (inControl)
         {
-                foreach (Node neighbour in currentNode.neighboursToUse)
+            foreach (Node neighbour in currentNode.neighboursToUse)
+            {
+                if (neighbour.blocked)
                 {
-                    if (neighbour.blocked)
-                    {
-                        targetNode = neighbour;
+                    targetNode = neighbour;
 
-                        break;
-                    }
+                    break;
                 }
-                Attack();
-            
+            }
+            Attack();
         }
     }
 
@@ -894,5 +890,86 @@ public class Unit : Entity
             xpBar.localScale = localScale;
         }
     }
+
+    #region Getter/Setters
+
+    //Stats
+    public int attack
+    {
+        get { return _attack + (int)_attackDamageBonus; }
+
+        set { _attack = value; }
+    }
+
+    public int accuracy
+    {
+        get { return _accuracy + (int)_attackAccuracyBonus; }
+
+        set { _accuracy = value; }
+    }
+
+    public int defense
+    {
+        get { return _defense + (int)_defenseBonus; }
+
+        set { _defense = value; }
+    }
+
+    public int agility
+    {
+        get { return _agility + (int)_agilityBonus; }
+
+        set { _agility = value; }
+    }
+
+    //EquipmentBonus
+    public float attackAccuracyBonus
+    {
+        get { return _attackAccuracyBonus; }
+
+        set { _attackAccuracyBonus = value; }
+    }
+
+    public float attackDamageBonus
+    {
+        get { return _attackDamageBonus; }
+
+        set { _attackDamageBonus = value; }
+    }
+
+    public float agilityBonus
+    {
+        get { return _agilityBonus; }
+
+        set { _agilityBonus = value; }
+    }
+
+    public float defenseBonus
+    {
+        get { return _defenseBonus; }
+
+        set { _defenseBonus = value; }
+    }
+
+    #endregion
+
+    #region Saving/Loading
+
+    public void Save()
+    {
+        //string saveInventory = JsonUtility.ToJson(inventory);
+        //PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", saveInventory);
+        inventory.Save();
+    }
+
+    public void Load()
+    {
+        //string loadInventory = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
+        //inventory = JsonUtility.FromJson<InventorySystem>(loadInventory);
+        inventory.Load();
+    }
+
+    #endregion
+
 }
 

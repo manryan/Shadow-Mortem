@@ -97,10 +97,22 @@ public class InventorySystem {
 
         for (int i = 0; i < inventory.Count; i++)
         {
-            if (i != inventory.Count - 1)
-                inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType + "*";
+            if(inventory[i].itemType != ItemType.Equipment)
+            {
+                if (i != inventory.Count - 1)//First it saves the name of the item, Then the Count, finalized by the Type of item along with the specific type if required
+                    inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType + "*";
+                else
+                    inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType;
+            }
             else
-                inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType;
+            {
+                Equipment equipment = (Equipment)inventory[i];
+
+                if (i != inventory.Count - 1)
+                    inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType + "/" + equipment.equipmentType + "*";
+                else
+                    inventorySave += inventory[i].itemName.ToString() + "^" + inventory[i].count.ToString() + "^" + inventory[i].itemType + "/" + equipment.equipmentType;
+            }
         }
 
         PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", inventorySave);
@@ -131,6 +143,7 @@ public class InventorySystem {
 
         inventory = new List<Item>();
 
+        //First it saves the name of the item, Then the Count, finalized by the Type of item along with the specific type if required
         for (int i = 0; i < inventoryLoad.Length; i++)
         {
             tempItemAndCount = inventoryLoad[i].Split("^".ToCharArray());
@@ -138,18 +151,6 @@ public class InventorySystem {
             tempItem.count = 0;
             Add(tempItem, System.Int32.Parse(tempItemAndCount[1]));
         }
-
-
-
-        //string loadInventory = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
-        //InventorySave inventoryLoad = JsonUtility.FromJson<InventorySave>(loadInventory);
-
-        //inventory = new List<Item>();
-
-        //for (int i = 0; i < inventoryLoad.saveList.Count; i++)
-        //{
-        //    Add(inventoryLoad.saveList[i].item, inventoryLoad.saveList[i].count);
-        //}
     }
 
     #endregion

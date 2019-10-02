@@ -12,7 +12,15 @@ public class ItemPickup : MonoBehaviour {
     {
         if(item.itemPrefab == null)
         {
-            item.itemPrefab = Resources.Load<GameObject>("Items/Prefabs/" + item.itemType.ToString() + "/" + item.name);
+            if(item.itemType != ItemType.Equipment)
+            {
+                item.itemPrefab = Resources.Load<GameObject>("Items/Prefabs/" + item.itemType.ToString() + "/" + item.name);
+            }
+            else
+            {
+                Equipment equipment = (Equipment)item;
+                item.itemPrefab = Resources.Load<GameObject>("Items/Prefabs/" + item.itemType.ToString() + "/" + equipment.equipmentType.ToString() + "/" + item.name);
+            }
         }
     }
 
@@ -21,6 +29,10 @@ public class ItemPickup : MonoBehaviour {
         if(item == null)
         {
             Debug.LogError(gameObject.name + " Missing its item Plugin", gameObject);
+        }
+        if(item.itemPrefab == null)
+        {
+            Debug.Log("Item Prefab is not being set, check to see if the name is matching or the equipment type",gameObject);
         }
         if(item.name != item.itemPrefab.name)
         {
