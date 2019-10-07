@@ -37,7 +37,7 @@ public class ObjectPoolingManager : MonoBehaviour {
 
     void Start()
     {
-        player = GameObject.Find("Update").transform.GetChild(0).gameObject;
+        player = GameObject.Find("Unit");
 
         #region Pooling Creation Amount Checker
 

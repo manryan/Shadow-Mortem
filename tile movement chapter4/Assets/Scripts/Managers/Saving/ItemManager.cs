@@ -36,7 +36,7 @@ public class ItemManager : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-    items = GameObject.FindGameObjectsWithTag("Items").ToList();
+        items = GameObject.FindGameObjectsWithTag("Items").ToList();
 
         string jsonString = PlayerPrefs.GetString("itemSave" + SceneManager.GetActiveScene().name + id.instance.saveIndex);
         tester = JsonUtility.FromJson<itemDataContainer>(jsonString);
