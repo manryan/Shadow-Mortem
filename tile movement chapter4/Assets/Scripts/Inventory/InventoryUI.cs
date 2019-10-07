@@ -222,6 +222,15 @@ public class InventoryUI : MonoBehaviour {
         tempImage.sprite = newItem.sprite;
         tempItemName.text = newItem.itemName;
         tempItemCount.text = ("x " + newItem.count.ToString());
+
+        if (newItem.count == 0)
+        {
+            tempItemCount.text = ("x " + "1");
+        }
+        else
+        {
+            tempItemCount.text = ("x " + newItem.count.ToString());
+        }
         tempImage.enabled = true;
         tempBackground.enabled = true;
         tempBackgroundButton.onClick.AddListener(() => { ItemOptions(slotIndex,newItem); });
