@@ -301,7 +301,7 @@ public class ObjectPoolingManager : MonoBehaviour {
 
     }
 
-<<<<<<< HEAD:tile movement chapter4/Assets/ObjectPoolingManager.cs
+
    
 
     public GameObject getReward(GameObject droppingItem, Vector3 pos)
@@ -351,9 +351,6 @@ public class ObjectPoolingManager : MonoBehaviour {
 
 
         public void DropTable(GameObject droppingItem, Vector3 pos)
-=======
-    public GameObject ObjectPoolFindNReturn(GameObject droppingItem, Vector3 location, int droppingHowMany = 1)
->>>>>>> master:tile movement chapter4/Assets/Scripts/ObjectPoolingManager.cs
     {
 
         for (int i = 0; i < 99; i++)

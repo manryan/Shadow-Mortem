@@ -30,7 +30,7 @@ public abstract partial class Item : ScriptableObject
     public bool stackable;
     public int count;
     public string itemDescription;
-
+    public Sprite defaultSprite;
     //Destroy Item in Inventory
 
     public virtual void Use()
