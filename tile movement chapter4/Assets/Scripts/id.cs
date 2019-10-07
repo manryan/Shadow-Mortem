@@ -53,7 +53,7 @@ public class id : MonoBehaviour {
 
                 SavePlayer(Application.persistentDataPath + "/gamesave.save" + saveIndex);
 
-                SceneManager.LoadScene("Game");
+                SceneManager.LoadScene("_SCENE_");
                 break;
             }
         }
@@ -74,7 +74,7 @@ public class id : MonoBehaviour {
 
         y = data.y;
 
-        SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("_SCENE_");
     }
 
    /* public void loadPlayer2(string path)
