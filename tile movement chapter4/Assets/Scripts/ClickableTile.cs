@@ -88,7 +88,7 @@ public class ClickableTile : MonoBehaviour
             if(Random.value * 100f < loot[i].spawnChance)
             {
                 //GameObject temp = Instantiate(loot[i].itemPrefab, new Vector3(tileX, tileY, -1), Quaternion.identity);
-                GameObject temp = obj.ObjectPoolFindNReturn(loot[i].itemPrefab, 1, new Vector3(tileX, tileY, -1));
+                GameObject temp = obj.getReward(loot[i].itemPrefab, new Vector3(tileX, tileY, -1));
                 //transform.GetChild(3).GetChild(i).gameObject.SetActive(true);
                 //transform.GetChild(3).GetChild(i).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 2 + myNode.index;
                 temp.transform.parent = transform.GetChild(3);

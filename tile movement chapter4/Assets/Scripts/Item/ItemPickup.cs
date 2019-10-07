@@ -8,6 +8,8 @@ public class ItemPickup : MonoBehaviour {
     public Item item;
     public int count;
 
+    public bool madeFromScratch;
+
     private void Awake()
     {
         if(item.itemPrefab == null)

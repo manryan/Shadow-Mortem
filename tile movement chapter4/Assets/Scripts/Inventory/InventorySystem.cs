@@ -7,9 +7,47 @@ public class InventorySystem {
 
     public List<Item> inventory = new List<Item>();
 
-    const int MAX_INVENTORY_SIZE = 16;    
+    const int MAX_INVENTORY_SIZE = 16;
 
     #region AddMethod
+
+    public bool checkIfWeCanAdd(Item item)
+    {
+        if (item.stackable == true)
+        {
+            if (inventory.Exists(x => x.itemName == item.itemName))
+            {
+                //     inventory.Find(x => x.itemName == item.itemName).count += itemCount;
+                return true;
+            }
+            else
+            {
+                //Check to see if there is any room in the inventory
+                if (inventory.Count < MAX_INVENTORY_SIZE)
+                {
+                    return true;
+                    //inventory.Add(item);
+                    // item.count += itemCount;//due to it being a scriptable object the count has to be seperated
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            if (inventory.Count < MAX_INVENTORY_SIZE)
+            {
+                return true;
+            }
+            else
+            {
+                //indicate that the inventory is full
+                return false;
+            }
+        }
+    }
 
     public void Add(Item item,int itemCount)
     {     

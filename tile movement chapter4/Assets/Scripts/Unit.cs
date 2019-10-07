@@ -724,12 +724,18 @@ public class Unit : Entity
     {
         if (currentNode.stack.Count > 0)
         {
+
             tempItemGameobject = currentNode.stack.Peek().gameObject;
 
             if(tempItemGameobject == null)
             {
                 Debug.LogError("Player is picking up an empty gameobject somehow");
             }
+            if (!inventory.checkIfWeCanAdd(tempItemGameobject.GetComponent<ItemPickup>().item))
+            {
+                return;
+            }
+
 
             //check if we have enough inventory space
             //if true do this
