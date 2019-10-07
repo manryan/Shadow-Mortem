@@ -48,8 +48,8 @@ public class GameManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        player = GameObject.FindGameObjectWithTag("Player");
-        playerInventory = player.GetComponent<Unit>().inventory;
+     //   player = GameObject.FindGameObjectWithTag("Player");
+     //   playerInventory = player.GetComponent<Unit>().inventory;
 	}
 
     //void ResetScriptableObjectsCount()  Moved to object pool manager
