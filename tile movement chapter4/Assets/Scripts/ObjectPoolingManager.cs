@@ -5,27 +5,27 @@ using System.Linq;
 
 public class ObjectPoolingManager : MonoBehaviour {
 
-    //public static ObjectPoolingManager _instance;//Reference
+    public static ObjectPoolingManager _instance;//Reference
 
-    //public static ObjectPoolingManager instance
-    //{
-    //    get { return _instance; }
-    //    set { _instance = value; }
-    //}
+    public static ObjectPoolingManager instance
+    {
+        get { return _instance; }
+        set { _instance = value; }
+    }
+
+    public ItemManager itemmanager;
 
     GameObject temp;//used for everything pretty much in object pooling
     GameManager GM;
+
+    public GameObject player;
 
     //Gold Pooling
     [Header("Gold")]
     public int goldPoolingAmount;
 
-    //Water Pooling
-    [Header("Water")]
-    public int waterPoolingAmount;
-
     //Standard Pooling
-    Dictionary<string, GameObject> itemCache = new Dictionary<string, GameObject>();
+   public Dictionary<string, GameObject> itemCache = new Dictionary<string, GameObject>();
 
     //Temp
     Transform playerCurrentLocation;
@@ -33,12 +33,11 @@ public class ObjectPoolingManager : MonoBehaviour {
     //Audio SFX
     [Header("Audio SFX")]
     public AudioClip goldSpawnSFX;
-    public AudioClip waterSpawnSFX;
-    public AudioClip equipmentSpawnSFX;
     public AudioClip consumablesSpawnSFX;
 
     void Start()
     {
+        player = GameObject.Find("Update").transform.GetChild(0).gameObject;
 
         #region Pooling Creation Amount Checker
 
@@ -46,12 +45,6 @@ public class ObjectPoolingManager : MonoBehaviour {
         {
             Debug.LogWarning("goldPoolingAmount is not set, setting to 3");
             goldPoolingAmount = 3;
-        }
-
-        if (waterPoolingAmount <= 0)
-        {
-            Debug.LogWarning("waterPoolingAmount is not set, setting to 5");
-            waterPoolingAmount = 5;
         }
 
         #endregion
@@ -87,22 +80,14 @@ public class ObjectPoolingManager : MonoBehaviour {
             {
                 for (int j = 0; j < goldPoolingAmount; j++)
                 {
-                    temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
-                    temp.SetActive(false);
-                }
-            }
-            else if(itemCache.ElementAt(i).Value.GetComponent<ItemPickup>().item.itemType == ItemType.Water)
-            {
-                for (int j = 0; j < waterPoolingAmount; j++)
-                {
-                    temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
-                    temp.SetActive(false);
+               //     temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
+                 //   temp.SetActive(false);
                 }
             }
             else
             { 
-                temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
-                temp.SetActive(false);
+               // temp = Instantiate(itemCache.ElementAt(i).Value, this.transform);
+               // temp.SetActive(false);
             }
 
         }
@@ -112,7 +97,6 @@ public class ObjectPoolingManager : MonoBehaviour {
         itemCache = new Dictionary<string, GameObject>();
 
         int counterAidGold = 0;
-        int counterAidWater = 0;
 
         for (int i = 0; i < this.transform.childCount; i++)
         {
@@ -121,14 +105,10 @@ public class ObjectPoolingManager : MonoBehaviour {
                 itemCache.Add(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + counterAidGold.ToString(), this.transform.GetChild(i).gameObject);
                 counterAidGold++;
             }
-            else if(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemType == ItemType.Water)
-            {
-                itemCache.Add(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + counterAidWater.ToString(), this.transform.GetChild(i).gameObject);
-                counterAidWater++;
-            }
             else
             {
                 //This will add one of each item in the scene and give it a key reference in the object pool with a number
+                if(!itemCache.ContainsKey(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + "0"))
                 itemCache.Add(this.transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + "0", this.transform.GetChild(i).gameObject);
             }
         }
@@ -141,51 +121,17 @@ public class ObjectPoolingManager : MonoBehaviour {
         GM.objPoolManager = this;
     }
 
-    #region Equiping Object Pool Item
+    public void sendit()
+    {
+        itemCache = new Dictionary<string, GameObject>();
 
-    //public GameObject EquipMethod(string equipmentName)
-    //{
+       // int counterAidGold = 0;
 
-    //    for (int i = 0; i < 99; i++)
-    //    {
-    //        if (itemCache.ContainsKey(equipmentName + i))
-    //        {
-    //            temp = itemCache[equipmentName + i];
-    //            if (temp.activeInHierarchy)
-    //            {
-    //                break;
-    //            }
-    //            else
-    //            {
-    //                //temp.GetComponent<Rigidbody>().isKinematic = true;
-    //                //temp.GetComponent<Rigidbody>().useGravity = false;
-    //                if (temp.GetComponent<MeshCollider>())
-    //                {
-    //                    temp.GetComponent<MeshCollider>().enabled = false;
-    //                }
-    //                if (temp.GetComponent<BoxCollider>())//just for the sword and other bs that dont have a mesh collider at the time
-    //                {
-    //                    temp.GetComponent<BoxCollider>().enabled = false;
-    //                }
-    //                temp.GetComponent<ItemPickup>().enabled = false;
-    //                temp.SetActive(true);
-    //                return temp;
-    //            }
-    //        }
-    //        else
-    //        {
-    //            temp = Instantiate(itemCache[equipmentName + "0"], this.transform);
-    //            itemCache.Add(temp.GetComponent<ItemPickup>().item.itemName + i, temp);
-    //            temp.GetComponent<Rigidbody>().detectCollisions = false;
-    //            temp.GetComponent<MeshCollider>().enabled = false;
-    //            temp.GetComponent<ItemPickup>().enabled = false;
-    //        }
-    //    }
-
-    //    return temp;
-    //}
-
-    #endregion
+        for (int i = 0; i < this.transform.childCount; i++)
+        {
+            ObjectPoolAddition(transform.GetChild(i).gameObject);
+        }
+    }
 
     #region UnEquiping Object Pool Item
 
@@ -223,7 +169,7 @@ public class ObjectPoolingManager : MonoBehaviour {
     {
         int counterAssistForDictionary = 0;
         bool exists = false;
-
+       // Debug.Log(newItem.name, newItem);
         for (int i = 0; i < 99; i++)
         {
             if (newItem.GetComponent<ItemPickup>() == null)
@@ -237,6 +183,23 @@ public class ObjectPoolingManager : MonoBehaviour {
 
             if (itemCache.ContainsValue(newItem))
             {
+                if(newItem.GetComponent<ItemPickup>().madeFromScratch)
+                {
+                    itemmanager.tester.objsToInstantiate.Remove(newItem.name);
+                }
+                else
+                {
+                    if(!itemmanager.tester.pool.Contains(newItem.name))
+                    itemmanager.addToPool(newItem);
+                }
+
+           /*     if(!itemmanager.tester.pool.Contains(newItem.name))
+                itemmanager.addToPool(newItem);
+                if (itemmanager.tester.objsToInstantiate.Contains(newItem.name))
+                {
+                    itemmanager.tester.objsToInstantiate.Remove(newItem.name);
+                }*/
+
                 newItem.transform.parent = this.transform;
                 newItem.SetActive(false);
                 Debug.Log("Item is already part of the item cache, Readding" + newItem.GetComponent<ItemPickup>().item.itemName + i);
@@ -255,6 +218,25 @@ public class ObjectPoolingManager : MonoBehaviour {
                 else
                 {
                     itemCache.Add(newItem.GetComponent<ItemPickup>().item.itemName + counterAssistForDictionary.ToString(), newItem);
+
+                    /*    if (!itemmanager.tester.pool.Contains(newItem.name))
+                            itemmanager.addToPool(newItem);
+                        if (itemmanager.tester.objsToInstantiate.Contains(newItem.name))
+                        {
+                            itemmanager.tester.objsToInstantiate.Remove(newItem.name);
+                        }*/
+
+                    if (newItem.GetComponent<ItemPickup>().madeFromScratch)
+                    {
+                        itemmanager.tester.objsToInstantiate.Remove(newItem.name);
+                    }
+                    else
+                    {
+                        if (!itemmanager.tester.pool.Contains(newItem.name))
+                            itemmanager.addToPool(newItem);
+                    }
+
+                    if (newItem.transform.parent!=this.transform)
                     newItem.transform.parent = this.transform;
                     newItem.SetActive(false);
                     Debug.Log("Item being added to the item cache, adding " + newItem.GetComponent<ItemPickup>().item.itemName + i);
@@ -265,39 +247,12 @@ public class ObjectPoolingManager : MonoBehaviour {
             }
         }
 
-        //for (int i = 0; i < 99; i++)
-        //{
-        //    if (itemCache.ContainsValue(newItem))
-        //    {
-        //        newItem.transform.parent = this.transform;
-        //        newItem.SetActive(false);
-        //        Debug.Log("Item is already part of the item cache, Readding" + newItem.GetComponent<ItemPickup>().item.itemName + i);
-        //        break;
-        //    }
-        //    else
-        //    {
-        //        exists = itemCache.ContainsKey(transform.GetChild(i).GetComponent<ItemPickup>().item.itemName + counterAssistForDictionary.ToString());
-        //        if (itemCache.ContainsKey(newItem.name + i))
-        //        {
-        //            //Debug.Log("item cache slot filled at index " + i,newItem);
-        //            //slot filled so it will go back through the loop
-        //        }
-        //        else
-        //        {
-        //            newItem.transform.parent = this.transform;
-        //            newItem.SetActive(false);
-        //            Debug.Log("Item being added to the item cache, adding " + newItem.GetComponent<ItemPickup>().item.itemName + i);
-        //            itemCache.Add(newItem.GetComponent<ItemPickup>().item.itemName + i, newItem);
-        //            break;
-        //        }
-        //    }
-        //}
-
     }
 
     #endregion
 
     #region Removing Object From Object Pool
+
 
     public void ObjectPoolPlayerDrop(GameObject droppingItem, int droppingHowMany)
     {
@@ -309,13 +264,19 @@ public class ObjectPoolingManager : MonoBehaviour {
                 temp = itemCache[droppingItem.GetComponent<ItemPickup>().item.itemName + i];
                 if (!temp.activeInHierarchy)
                 {
-                    temp.transform.parent = GM.player.GetComponent<Unit>().currentNode.myTile.transform.Find("loot");
-                    temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
-                    temp.GetComponent<ItemPickup>().count = droppingHowMany;
-                    temp.SetActive(true);
-                    GM.player.GetComponent<Unit>().currentNode.stack.Push(temp);
-                    GM.player.GetComponent<Unit>().displayPickUpButton();
-                    Debug.Log("Found inactive object ", temp);
+                        temp.transform.position = player.transform.position;
+                        temp.GetComponent<ItemPickup>().count = droppingHowMany;
+                        temp.SetActive(true);
+                    //  temp.transform.localPosition = new Vector3(0, 0, -1);
+                    if (!temp.GetComponent<ItemPickup>().madeFromScratch)
+                    {
+                        itemmanager.removeFromPool(temp);
+                    }
+                    else
+                    {
+                    //    itemmanager.tester.pool.Remove(temp.name);
+                        itemmanager.tester.objsToInstantiate.Add(temp.name);
+                    }
                     break;
                 }
                 else
@@ -327,47 +288,156 @@ public class ObjectPoolingManager : MonoBehaviour {
             else
             {
                 temp = Instantiate(droppingItem.GetComponent<ItemPickup>().item.itemPrefab, Vector3.zero, Quaternion.identity);
-                temp.transform.parent = GM.player.GetComponent<Unit>().currentNode.myTile.transform.Find("loot");
-                temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
-                temp.GetComponent<ItemPickup>().count += droppingHowMany;
-                GM.player.GetComponent<Unit>().currentNode.stack.Push(temp);
-                GM.player.GetComponent<Unit>().displayPickUpButton();
+                temp.transform.position = player.transform.position;
+                temp.name += itemmanager.tester.objsToInstantiate.Count;
+                itemmanager.items.Add(temp);
+                itemmanager.tester.objsToInstantiate.Add(temp.name);
+                //   temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
+                temp.GetComponent<ItemPickup>().count = droppingHowMany;
+                temp.GetComponent<ItemPickup>().madeFromScratch = true;
                 break;
             }
         }
 
     }
 
-    public GameObject ObjectPoolFindNReturn(GameObject droppingItem, Vector3 location, int droppingHowMany = 1)
+<<<<<<< HEAD:tile movement chapter4/Assets/ObjectPoolingManager.cs
+   
+
+    public GameObject getReward(GameObject droppingItem, Vector3 pos)
     {
 
-        for (int i = 0; i < Mathf.Infinity; i++)
+
+        for (int i = 0; i < 99; i++)
         {
             if (itemCache.ContainsKey(droppingItem.GetComponent<ItemPickup>().item.itemName + i))
             {
                 temp = itemCache[droppingItem.GetComponent<ItemPickup>().item.itemName + i];
                 if (!temp.activeInHierarchy)
                 {
-                    temp.transform.position = location;
-                    temp.GetComponent<ItemPickup>().count = droppingHowMany;
-                    temp.transform.parent = null;
-                    temp.SetActive(true);
-                    Debug.Log("Found inactive object ", temp);
-                    return temp;
+
+                   /* if (!temp.GetComponent<ItemPickup>().madeFromScratch)
+                        itemmanager.removeFromPool(temp);
+                    else
+                    {
+                        itemmanager.tester.objsToInstantiate.Add(temp.name);
+                    }*/
                 }
+                else
+                {
+                    continue;
+                }
+
+                break;
             }
             else
             {
-                temp = Instantiate(droppingItem, location, Quaternion.identity);
-                temp.GetComponent<ItemPickup>().count += droppingHowMany;
-                temp.transform.parent = null;
-                Debug.Log("Inactive object not Found, Creating New Object", temp);
-                return temp;
+                temp = Instantiate(droppingItem, Vector3.zero, Quaternion.identity);
+                Debug.Log(temp + "made");
+                temp.transform.position = pos;
+
+                itemmanager.items.Add(temp);
+                itemmanager.tester.objsToInstantiate.Add(temp.name);
+                temp.SetActive(true);
+                temp.GetComponent<ItemPickup>().madeFromScratch = true;
+                //   temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
+                //     temp.GetComponent<ItemPickup>().count = droppingHowMany;
+                break;
             }
         }
-        Debug.Log("Unreachable Code Detected, fucked up somewhere in object pooling");
-        return null;
+
+            return temp;
     }
+
+
+        public void DropTable(GameObject droppingItem, Vector3 pos)
+=======
+    public GameObject ObjectPoolFindNReturn(GameObject droppingItem, Vector3 location, int droppingHowMany = 1)
+>>>>>>> master:tile movement chapter4/Assets/Scripts/ObjectPoolingManager.cs
+    {
+
+        for (int i = 0; i < 99; i++)
+        {
+            if (itemCache.ContainsKey(droppingItem.GetComponent<ItemPickup>().item.itemName + i))
+            {
+                temp = itemCache[droppingItem.GetComponent<ItemPickup>().item.itemName + i];
+                if (!temp.activeInHierarchy)
+                {
+                    //  temp.transform.localPosition = new Vector3(0, 0, -1);
+                    //   temp.transform.position = player.transform.position;
+
+                        temp.transform.position =  pos;
+                        temp.SetActive(true);
+                    if(!temp.GetComponent<ItemPickup>().madeFromScratch)
+                        itemmanager.removeFromPool(temp);
+                    else
+                    {
+                   //     itemmanager.tester.pool.Remove(temp.name);
+                        itemmanager.tester.objsToInstantiate.Add(temp.name);
+                    }
+                }
+                else
+                {
+                    Debug.Log("This item is active" + droppingItem.GetComponent<ItemPickup>().item.itemName + i);
+                    continue;
+                }
+
+                    break;
+
+            }
+            else
+            {
+                temp = Instantiate(droppingItem, Vector3.zero, Quaternion.identity);
+                Debug.Log(temp + "made");
+                temp.transform.position = pos;
+                temp.name += itemmanager.tester.objsToInstantiate.Count;
+                temp.GetComponent<ItemPickup>().madeFromScratch = true;
+                    itemmanager.items.Add(temp);
+                    itemmanager.tester.objsToInstantiate.Add(temp.name);
+                    temp.SetActive(true);
+                //   temp.transform.localPosition = new Vector3(0, 0, -1);//This is to make the item pop up on the Z axis
+                //     temp.GetComponent<ItemPickup>().count = droppingHowMany;
+                break;
+            }
+        }
+
+
+
+    }
+
+
+    /*
+        public GameObject ObjectPoolFindNReturn(GameObject droppingItem, int droppingHowMany, Vector3 location)
+        {
+
+            for (int i = 0; i < Mathf.Infinity; i++)
+            {
+                if (itemCache.ContainsKey(droppingItem.GetComponent<ItemPickup>().item.itemName + i))
+                {
+                    temp = itemCache[droppingItem.GetComponent<ItemPickup>().item.itemName + i];
+                    if (!temp.activeInHierarchy)
+                    {
+                        temp.transform.position = location;
+                        temp.GetComponent<ItemPickup>().count = droppingHowMany;
+                        temp.transform.parent = null;
+                        temp.SetActive(true);
+                        Debug.Log("Found inactive object ", temp);
+                        return temp;
+                    }
+                }
+                else
+                {
+                    temp = Instantiate(droppingItem, location, Quaternion.identity);
+                    temp.GetComponent<ItemPickup>().count += droppingHowMany;
+                    temp.transform.parent = null;
+                    Debug.Log("Inactive object not Found, Creating New Object", temp);
+                    return temp;
+                }
+            }
+            Debug.Log("Unreachable Code Detected, fucked up somewhere in object pooling");
+            return null;
+        }
+        */
 
     #endregion
 

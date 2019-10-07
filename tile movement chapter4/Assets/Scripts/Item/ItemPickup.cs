@@ -8,11 +8,15 @@ public class ItemPickup : MonoBehaviour {
     public Item item;
     public int count;
 
+<<<<<<< HEAD
+    public bool madeFromScratch;
+=======
     public ItemPickup(Item CurrentItem,int CurrentCount = 1)
     {
         item = CurrentItem;
         count = CurrentCount;
     }
+>>>>>>> master
 
     private void Awake()
     {
