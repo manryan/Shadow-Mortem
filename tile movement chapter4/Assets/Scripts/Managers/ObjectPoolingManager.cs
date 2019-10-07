@@ -5,13 +5,31 @@ using System.Linq;
 
 public class ObjectPoolingManager : MonoBehaviour {
 
+    #region Object Manager Singleton/Awake
+
     public static ObjectPoolingManager _instance;//Reference
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != null)
+        {
+            Destroy(gameObject);
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
 
     public static ObjectPoolingManager instance
     {
         get { return _instance; }
         set { _instance = value; }
     }
+    
+    #endregion
 
     public ItemManager itemmanager;
 

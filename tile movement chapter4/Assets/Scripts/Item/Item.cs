@@ -36,6 +36,6 @@ public abstract partial class Item : ScriptableObject
     public virtual void Use()
     {
         //calls the use function from whatever inherits from this
-        GameManager.instance.playerInventory.Remove(this, 1);//Destroy Item in Inventory
+        GameManager.instance.playerInventory.Remove(this);//Destroy Item in Inventory
     }
 }

@@ -89,7 +89,7 @@ public class InventorySystem {
 
     #region RemoveMethod
 
-    public void Remove(Item item, int itemCount)
+    public void Remove(Item item, int itemCount = 1)
     {
 
         if(item.stackable == true)

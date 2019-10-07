@@ -65,6 +65,6 @@ public class ItemPickup : MonoBehaviour {
 
     void Reset()//Called when this component is added
     {
-        this.gameObject.tag = "Item";
+        gameObject.tag = "Item";
     }
 }
