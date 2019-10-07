@@ -15,8 +15,8 @@ public class ItemPickup : MonoBehaviour {
     {
         item = CurrentItem;
         count = CurrentCount;
+        this.gameObject.tag += "Item";
     }
-
 
     private void Awake()
     {
@@ -57,6 +57,11 @@ public class ItemPickup : MonoBehaviour {
             item.sprite = GetComponent<SpriteRenderer>().sprite;
         }
 
+    }
+
+    void Reset()//Called when this component is added
+    {
+        this.gameObject.tag += "Item";
     }
 
     //public void Pickup() Implimented on the unit script on pick up
