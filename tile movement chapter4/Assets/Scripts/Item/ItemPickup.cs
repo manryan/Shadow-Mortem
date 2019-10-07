@@ -15,7 +15,6 @@ public class ItemPickup : MonoBehaviour {
     {
         item = CurrentItem;
         count = CurrentCount;
-        this.gameObject.tag += "Item";
     }
 
     private void Awake()
@@ -57,15 +56,15 @@ public class ItemPickup : MonoBehaviour {
             item.sprite = GetComponent<SpriteRenderer>().sprite;
         }
 
+        if (gameObject.CompareTag("Item") == false)
+        {
+            Debug.LogWarning("This GameObject Prefab Is Missing The Item Tag");
+        }
+
     }
 
     void Reset()//Called when this component is added
     {
-        this.gameObject.tag += "Item";
+        this.gameObject.tag = "Item";
     }
-
-    //public void Pickup() Implimented on the unit script on pick up
-    //{
-    //    GameManager.instance.playerInventory.Add(item, count);
-    //}
 }
