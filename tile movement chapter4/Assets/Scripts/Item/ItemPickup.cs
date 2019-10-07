@@ -8,6 +8,12 @@ public class ItemPickup : MonoBehaviour {
     public Item item;
     public int count;
 
+    public ItemPickup(Item CurrentItem,int CurrentCount = 1)
+    {
+        item = CurrentItem;
+        count = CurrentCount;
+    }
+
     private void Awake()
     {
         if(item.itemPrefab == null)

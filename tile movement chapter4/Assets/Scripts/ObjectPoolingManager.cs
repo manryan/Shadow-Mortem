@@ -338,27 +338,7 @@ public class ObjectPoolingManager : MonoBehaviour {
 
     }
 
-    //Transform FindTilePlayerIsOn()
-    //{
-    //    playerCurrentLocation = GameManager.instance.player.transform;
-    //    Collider[] hit = Physics.OverlapSphere(playerCurrentLocation.transform.position, 1);
-    //    for (int i = 0; i < hit.Length; i++)
-    //    {
-    //        if(hit[i].GetComponent<ClickableTile>())
-    //        {
-    //            if(hit[i].GetComponent<ClickableTile>().tileX == playerCurrentLocation.transform.position.x && hit[i].GetComponent<ClickableTile>().tileY == playerCurrentLocation.transform.position.y)
-    //            {
-    //                playerCurrentLocation = hit[i].transform.Find("loot");
-    //                return playerCurrentLocation;
-    //            }
-
-    //        }
-    //    }
-    //    Debug.Log("This loop fucked up somehow");
-    //    return null;
-    //}
-
-    public GameObject ObjectPoolFindNReturn(GameObject droppingItem, int droppingHowMany, Vector3 location)
+    public GameObject ObjectPoolFindNReturn(GameObject droppingItem, Vector3 location, int droppingHowMany = 1)
     {
 
         for (int i = 0; i < Mathf.Infinity; i++)
