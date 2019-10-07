@@ -354,6 +354,7 @@ public class ObjectPoolingManager : MonoBehaviour {
                 Debug.Log(temp + "made");
                 temp.transform.position = pos;
 
+                temp.name += itemmanager.tester.objsToInstantiate.Count;
                 itemmanager.items.Add(temp);
                 itemmanager.tester.objsToInstantiate.Add(temp.name);
                 temp.SetActive(true);

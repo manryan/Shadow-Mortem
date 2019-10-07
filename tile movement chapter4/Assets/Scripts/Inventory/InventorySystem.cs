@@ -116,18 +116,6 @@ public class InventorySystem {
     //make a bool to check to see if this item can be added to the inventory;
 
     #region Saving/Loading
-    
-    struct ItemAndCount
-    {
-        public Item item;
-        public int count;
-    }
-
-    [System.Serializable]
-    class InventorySave
-    {
-        public List<ItemAndCount> saveList;
-    }
 
     public void Save()
     {

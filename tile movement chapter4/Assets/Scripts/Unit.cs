@@ -102,6 +102,15 @@ public class Unit : Entity
         currentPath = null;
 
         localScale = healthbar.localScale;
+
+        if(objPoolManager.itemmanager.tester==null)
+        {
+            objPoolManager.itemmanager.initializeEnemies();
+        }
+        else
+        {
+            objPoolManager.itemmanager.loadEnemies();
+        }
     }
 
     public void setBounds()
@@ -963,6 +972,7 @@ public class Unit : Entity
         //string saveInventory = JsonUtility.ToJson(inventory);
         //PlayerPrefs.SetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory", saveInventory);
         inventory.Save();
+        saveScene();
     }
 
     public void Load()
@@ -970,6 +980,34 @@ public class Unit : Entity
         //string loadInventory = PlayerPrefs.GetString("PlayerSave" + "IDFILLEDHERE" + "/Inventory");
         //inventory = JsonUtility.FromJson<InventorySystem>(loadInventory);
         inventory.Load();
+        loadScene();
+    }
+
+    public void loadScene()
+    {
+        //health
+
+        health = id.instance.health;
+        float p = health / maxHealth;
+        float userHpBarLength = p;//P * (scale in x)
+        localScale.x = userHpBarLength;
+        healthbar.localScale = localScale;
+
+        //position
+        transform.position = new Vector3(id.instance.x, id.instance.y, -1);
+        currentNode = map.graph[(int)id.instance.x,(int) id.instance.y];
+
+    }
+
+
+    public void saveScene()
+    {
+        id.instance.health = health;
+        id.instance.x = transform.position.x;
+        id.instance.y = transform.position.y;
+        id.instance.time = System.DateTime.Now;
+        objPoolManager.itemmanager.saveEm();
+        id.instance.SavePlayer(Application.persistentDataPath + "/gamesave.save" + id.instance.saveIndex);
     }
 
     #endregion
